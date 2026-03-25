@@ -3,6 +3,12 @@
 #define PLATFORMER_GAME_H
 
 #include <SFML/Graphics.hpp>
+#include <nlohmann/json.hpp>
+#include "Tile.h"
+#include "Map.h"
+#include "GameObject.h"
+#include "JsonLoader.h"
+#include "Vector.h"
 
 class Game
 {
@@ -15,10 +21,20 @@ class Game
   void mouseClicked(sf::Event event);
   void keyPressed(sf::Event event);
 
+  sf::IntRect GetRectForTileId(int id);
+
+  Vector target_position;
+
+  sf::Vector2i speed;
+
  private:
   sf::RenderWindow& window;
-  sf::Sprite ball;
-  sf::Texture ball_texture;
+  
+  std::unique_ptr <Map> map;
+
+  std::unique_ptr <GameObject> player;
+
+  sf::Texture player_texture;
 
 };
 
