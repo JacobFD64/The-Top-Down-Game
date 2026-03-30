@@ -27,7 +27,7 @@ FetchContent_MakeAvailable(nlohmann_json)
 #---- File management & .exe creation ----#
 
 set(SOURCE_FILES src/main.cpp src/Game.cpp src/Game.h src/Map.cpp src/Map.h src/Layer.cpp src/Layer.h src/Tile.cpp src/Tile.h src/JsonLoader.h src/JsonLoader.cpp)  # Sets variable SOURCE_FILES to hold names & locations of files that need to be compiled into the application
-add_executable(PlatformerSFML ${SOURCE_FILES} "src/GameObject.h" "src/GameObject.cpp" "src/Vector.h" "src/Vector.cpp")  # Names the application and tells compiler which source files to use
+add_executable(PlatformerSFML ${SOURCE_FILES} "src/GameObject.h" "src/GameObject.cpp" "src/Vector.h" "src/Vector.cpp" "src/Collectible.h" "src/Collectible.cpp" "src/Pathfinder.h" "src/Pathfinder.cpp" "src/Node.h" "src/Node.cpp")  # Names the application and tells compiler which source files to use
 
 target_link_libraries(PlatformerSFML PRIVATE sfml-graphics sfml-window sfml-system sfml-network sfml-audio nlohmann_json::nlohmann_json) # Links the SFML libraries we need to our application
 target_compile_features(PlatformerSFML PRIVATE cxx_std_20)  # Defines which standard of C++ the compiler should use

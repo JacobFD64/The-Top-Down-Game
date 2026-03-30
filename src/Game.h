@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "JsonLoader.h"
 #include "Vector.h"
+#include "Collectible.h"
 
 class Game
 {
@@ -23,9 +24,9 @@ class Game
 
   sf::IntRect GetRectForTileId(int id);
 
-  Vector target_position;
+  Collectible coin;
 
-  sf::Vector2i speed;
+  sf::Texture coin_texture;
 
  private:
   sf::RenderWindow& window;

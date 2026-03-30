@@ -74,6 +74,31 @@ bool GameObject::collisionCheck(sf::Sprite& sprite1, sf::Sprite& sprite2)
         return false;
     }
 }
+void GameObject::moveTowards(sf::Vector2i& target)
+{
+    direction.x = target.x - (getSprite().getPosition().x + getSprite().getGlobalBounds().width / 2);
+    direction.y = target.y - (getSprite().getPosition().y + getSprite().getGlobalBounds().height / 2);
+
+    direction.normalise();
+
+    velocity.x = direction.x * getSpeed();
+    velocity.y = direction.y * getSpeed();
+
+    target_position = target;
+}
+bool GameObject::hasReachedTarget()
+{
+    if (
+		std::abs((position.x + getSprite().getGlobalBounds().width / 2) - target_position.x) <= 2 &&
+        std::abs((position.y + getSprite().getGlobalBounds().height / 2) - target_position.y) <= 2)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 void GameObject::update()
 {
     // store sprite position in vector
