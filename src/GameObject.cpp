@@ -74,7 +74,7 @@ bool GameObject::collisionCheck(sf::Sprite& sprite1, sf::Sprite& sprite2)
         return false;
     }
 }
-void GameObject::moveTowards(sf::Vector2i& target)
+void GameObject::moveTowards(sf::Vector2f& target)
 {
     direction.x = target.x - (getSprite().getPosition().x + getSprite().getGlobalBounds().width / 2);
     direction.y = target.y - (getSprite().getPosition().y + getSprite().getGlobalBounds().height / 2);

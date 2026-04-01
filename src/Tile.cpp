@@ -8,3 +8,8 @@ Tile::Tile(int POS_ID,int TILE_ID, int X, int Y, std::shared_ptr<sf::Texture> te
 	sprite = std::make_unique<sf::Sprite>();
 	sprite->setTexture(*texture);
 }
+
+bool Tile::isSearched()
+{
+	return searched;
+}

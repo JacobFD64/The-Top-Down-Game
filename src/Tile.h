@@ -8,6 +8,10 @@ public:
 
 	int getPosID() const { return pos_id; }
 	int getTileID() const { return tile_id; }
+	int getParentTileID() const { return parent_tile_id; }
+	void setParentTileID(int id) { parent_tile_id = id; }
+	bool isSearched();
+	void setSearched(bool Searched) { searched = Searched; }
 	int getX() const { return x; }
 	int getY() const { return y; }
     sf::Sprite& GetSprite() { return *sprite; };
@@ -20,5 +24,9 @@ private:
 	int tile_id;
 	int x;
 	int y;
+
+	//Pathfinding
+	bool searched = false;
+	int parent_tile_id = -1;
 
 };

@@ -10,6 +10,7 @@
 #include "JsonLoader.h"
 #include "Vector.h"
 #include "Collectible.h"
+#include "Pathfinder.h"
 
 class Game
 {
@@ -34,6 +35,8 @@ class Game
   std::unique_ptr <Map> map;
 
   std::unique_ptr <GameObject> player;
+
+  std::unique_ptr <Pathfinder> pathfinder;
 
   sf::Texture player_texture;
 

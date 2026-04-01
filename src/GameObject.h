@@ -18,7 +18,7 @@ public:
 	bool getIsVisible();
 	int getSpeed() { return speed; };
 	bool collisionCheck(sf::Sprite& sprite1, sf::Sprite& sprite2);
-	void moveTowards(sf::Vector2i& target);
+	void moveTowards(sf::Vector2f& target);
     bool hasReachedTarget();
 	void update();
 
@@ -26,7 +26,7 @@ public:
 	Vector position;
 	Vector direction;
 
-	sf::Vector2i target_position;
+	sf::Vector2f target_position;
 
 private:
 	sf::Sprite sprite;

@@ -37,7 +37,7 @@ Map JsonLoader::LoadMapFromJson(std::string path)
 			for (size_t i = 0; i < data.size(); i++)
 			{
 				int tile_id = data[i].get<int>();
-				int pos_id = data[i];
+				int pos_id = i;
 
 				int x = i % map.GetWidth();
 				int y = i / map.GetHeight();

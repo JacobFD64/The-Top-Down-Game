@@ -19,11 +19,13 @@ bool Game::init()
 
 	player = std::make_unique<GameObject>();
 
-	player->getSprite().setScale(0.6, 0.6);
-	player->getSprite().setPosition(540, 360);
+	player->getSprite().setScale(0.4, 0.4);
+	player->getSprite().setPosition(600, 360);
 
 	
 	player->initialiseSprite(player_texture, "C:/Users/JacobFD64/Source/Repos/The-Top-Down-Game/Data/Images/kenney_animalpackredux/PNG/Round/bear.png");
+
+	pathfinder = std::make_unique<Pathfinder>();
 
 	coin.initialiseSprite(coin_texture, "C:/Users/JacobFD64/Source/Repos/The-Top-Down-Game/Data/Images/kenney_physicspack/PNG/Other/coinGold.png");
 
@@ -32,9 +34,27 @@ bool Game::init()
 
 void Game::update(float dt)
 {
-	if (player->hasReachedTarget())
+	if (pathfinder->current_node < pathfinder->path.size())
 	{
-		player->velocity = Vector(0, 0);
+		sf::Vector2f target = pathfinder->path[pathfinder->current_node]->GetSprite().getPosition() + sf::Vector2f(map->GetTileSize() / 2, map->GetTileSize() / 2);
+		sf::Vector2f direction = target - player->getSprite().getPosition() + sf::Vector2f(player->getSprite().getGlobalBounds().width / 2, player->getSprite().getGlobalBounds().height / 2);
+		float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+		if (player->hasReachedTarget())
+		{
+          pathfinder->current_node++;
+		}
+		else
+		{
+			direction /= distance;
+			player->moveTowards(target);
+		}
+	}
+	else
+	{
+		player->velocity = (0,0);
+		pathfinder->current_node = 0;
+		pathfinder->path.clear();
 	}
 	player->update();
 
@@ -49,19 +69,6 @@ void Game::render()
 		{
 			tile.GetSprite().setTextureRect(GetRectForTileId(tile.getTileID()));
 			if (tile.getTileID() <= 0) continue;
-
-			/*float scale_y_multiplier = 1.8;
-			float scale_x_multiplier = 1.8;*/
-
-			/*tile.GetSprite().setScale(
-				scale_x_multiplier,
-				scale_y_multiplier
-			);*/
-			
-			/*tile.GetSprite().setPosition(
-			((tile.getX() * map->GetTileSize()) * scale_x_multiplier) + (540 - (map->GetWidth() * (map->GetTileSize() * scale_x_multiplier) / 2)),
-			((tile.getY() * map->GetTileSize()) * scale_y_multiplier) + (360 - (map->GetHeight() * (map->GetTileSize() * scale_y_multiplier) / 2))
-			);*/
 
 			tile.GetSprite().setPosition(
 				(tile.getX() * map->GetTileSize()),
@@ -102,22 +109,14 @@ void Game::mouseClicked(sf::Event event)
   //get the click position
   sf::Vector2i click = sf::Mouse::getPosition(window);
   sf::Vector2f world_pos = window.mapPixelToCoords(click);
+  pathfinder->current_node = 0;
+  pathfinder->path.clear();
 
-  int clicked_tile_col = world_pos.x / map->GetTileSize();
-  int clicked_tile_row = world_pos.y / map->GetTileSize();
+  sf::Vector2f player_pos = player->getSprite().getPosition() + sf::Vector2f(player->getSprite().getGlobalBounds().width / 2, player->getSprite().getGlobalBounds().height / 2);
+  pathfinder->path = pathfinder->findPath(player_pos, world_pos, *map);
+  std::reverse(pathfinder->path.begin(), pathfinder->path.end());
 
-  int clicked_tile_id = clicked_tile_col + (clicked_tile_row * map->GetWidth());
-
-  std::cout << clicked_tile_col << " " << clicked_tile_row << std::endl;
-  std::cout << clicked_tile_id << std::endl;
-
-  map->GetLayers()[0].GetTiles()[clicked_tile_id].GetSprite().setColor(sf::Color::Red);
-  map->GetLayers()[0].GetTiles()[clicked_tile_id + 1].GetSprite().setColor(sf::Color::Red);
-  map->GetLayers()[0].GetTiles()[clicked_tile_id - 1].GetSprite().setColor(sf::Color::Red);
-  map->GetLayers()[0].GetTiles()[clicked_tile_id - map->GetWidth()].GetSprite().setColor(sf::Color::Red);
-  map->GetLayers()[0].GetTiles()[clicked_tile_id + map->GetWidth()].GetSprite().setColor(sf::Color::Red);
-
-  player->moveTowards(click);
+  
 
 }
 

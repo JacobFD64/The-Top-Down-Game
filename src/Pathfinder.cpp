@@ -1,4 +1,6 @@
 #include "Pathfinder.h"
+#include <queue>
+#include <iostream>
 
 Pathfinder::Pathfinder()
 {
@@ -8,57 +10,99 @@ Pathfinder::~Pathfinder()
 {
 }
 
-void Pathfinder::initNodes(Map& map)
+std::vector<Tile*> Pathfinder::findPath(sf::Vector2f& start_pos, sf::Vector2f& target_pos, Map& map)
 {
-
-}
-
-void Pathfinder::findPath(sf::Vector2f& start_pos, sf::Vector2f& target_pos, Map& map)
-{
+	reset(map);
 	// make a list of all the tiles to search and have been searched
-	std::vector<Node> tile_ids_to_search;
-	std::vector<Node> tile_ids_searched;
+	std::queue<Tile*> tiles_to_search;
 	
 	// get the id of the start and target tile
-	int start_tile_id = getTileIdAtPosition(start_pos, map);
-	int target_tile_id = getTileIdAtPosition(target_pos, map);
+	Tile& start_tile = getTileAtPosition(start_pos, map);
+	Tile& target_tile = getTileAtPosition(target_pos, map);
 
 	// add the start tile to the list to be searched
-	tile_ids_to_search.push_back(start_tile_id);
-
-	for (int i = 0; i < tile_ids_to_search.size(); i++)
+	tiles_to_search.push(&start_tile);
+	while (!tiles_to_search.empty())
 	{
-		if (i == target_tile_id)
+		//Get id of front tile in queue then remove it
+		Tile* current = tiles_to_search.front();
+		tiles_to_search.pop();
+		// add the id to the searched list
+		current->setSearched(true);
+		current->GetSprite().setColor(sf::Color::Red);
+
+		 //Check if the id is the target tile
+		if (current->getPosID() == target_tile.getPosID())
 		{
-			// end and loop back over parent tiles
+			std::vector<Tile*> path;
+
+			while (current->getPosID() != start_tile.getPosID())
+			{
+				path.push_back(current);
+				current = &map.GetLayers()[0].GetTiles()[current->getParentTileID()];
+			}
+
+			for (Tile* tile : path)
+			{
+				tile->GetSprite().setColor(sf::Color::Green);
+			}
+			return path;
 		}
-        // add the tile to the list of searched tiles
-		tile_ids_searched.push_back(tile_ids_to_search[i]);
-
-		// get the tile ids of the next tiles to check
-		int right_tile_id = i + 1;
-		int left_tile_id = i - 1;
-		int top_tile_id = i - map.GetWidth();
-		int bottom_tile_id = i + map.GetWidth();
-
-		// add them to the list to be searched if not searched already
-		tile_ids_to_search.push_back(right_tile_id);
-		tile_ids_to_search.push_back(left_tile_id);
-		tile_ids_to_search.push_back(top_tile_id);
-		tile_ids_to_search.push_back(bottom_tile_id);
-        
+		// add ajacent tiles to queue
+		addTileToQueue(current->getPosID() + 1, tiles_to_search, map,*current);
+		addTileToQueue(current->getPosID() - 1, tiles_to_search, map, *current);
+		addTileToQueue(current->getPosID() - map.GetWidth(), tiles_to_search, map, *current);
+		addTileToQueue(current->getPosID() + map.GetWidth(), tiles_to_search, map, *current);
 	}
-
-
 
 }
 
-int Pathfinder::getTileIdAtPosition(sf::Vector2f& pos, Map& map)
+void Pathfinder::addTileToQueue(int tile_id, std::queue<Tile*>& tile_queue, Map& map, Tile& parent_tile)
+{
+	Tile& tile = map.GetLayers()[0].GetTiles()[tile_id];
+
+	if (isTileValid(tile_id, map) && !tile.isSearched())
+	{
+		tile_queue.push(&tile);
+		tile.setParentTileID(parent_tile.getPosID());
+	}
+	tile.setSearched(true);
+}
+
+bool Pathfinder::isTileValid(int tile_id, Map& map)
+{
+	bool valid = true;
+
+	for (Layer& layer : map.GetLayers())
+	{
+		if (layer.GetTiles()[tile_id].getTileID() == 11)
+		{
+			valid = false;
+		}
+		else
+		{
+			valid = true;
+		}
+	}
+	return valid;
+}
+
+Tile& Pathfinder::getTileAtPosition(sf::Vector2f& pos, Map& map)
 {
 	int tile_col = pos.x / map.GetTileSize();
 	int tile_row = pos.y / map.GetTileSize();
 
 	int tile_id = tile_col + (tile_row * map.GetWidth());
 
-	return tile_id;
+	Tile& tile = map.GetLayers()[0].GetTiles()[tile_id];
+
+	return tile;
+}
+void Pathfinder::reset(Map& map)
+{
+	for (Tile& tile : map.GetLayers()[0].GetTiles())
+	{
+		tile.setSearched(false);
+		tile.GetSprite().setColor(sf::Color::White);
+	}
 }
