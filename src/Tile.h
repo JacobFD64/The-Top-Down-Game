@@ -4,10 +4,11 @@
 class Tile
 {
 public:
-	Tile(int POS_ID, int TILE_ID, int X, int Y, std::shared_ptr<sf::Texture> tex);
+	Tile(int POS_ID, int TILE_ID, int X, int Y,bool COLLIDABLE, std::shared_ptr<sf::Texture> tex);
 
 	int getPosID() const { return pos_id; }
 	int getTileID() const { return tile_id; }
+	bool getIsCollidable() const { return is_collidable; }
 	int getParentTileID() const { return parent_tile_id; }
 	void setParentTileID(int id) { parent_tile_id = id; }
 	bool isSearched();
@@ -27,6 +28,7 @@ private:
 
 	//Pathfinding
 	bool searched = false;
+	bool is_collidable = false;
 	int parent_tile_id = -1;
 
 };

@@ -65,17 +65,20 @@ void Pathfinder::addTileToQueue(int tile_id, std::queue<Tile*>& tile_queue, Map&
 
 bool Pathfinder::isTileValid(int tile_id, Map& map)
 {
-	bool valid = true;
+	bool valid = false;
 
 	for (Layer& layer : map.GetLayers())
 	{
-		if (layer.GetTiles()[tile_id].getTileID() == 11)
+		if (tile_id > 0 || tile_id <= layer.GetTiles().size())
 		{
-			valid = false;
-		}
-		else
-		{
-			valid = true;
+			if (layer.GetTiles()[tile_id].getTileID() == 11)
+			{
+				valid = false;
+			}
+			else
+			{
+				valid = true;
+			}
 		}
 	}
 	return valid;
@@ -83,14 +86,25 @@ bool Pathfinder::isTileValid(int tile_id, Map& map)
 
 Tile& Pathfinder::getTileAtPosition(sf::Vector2f& pos, Map& map)
 {
+	int tile_id = getTileIdAtPosition(pos, map);
+
+	if (tile_id < 0 || tile_id >= map.GetLayers()[1].GetTiles().size())
+	{
+		return map.GetLayers()[1].GetTiles()[0];
+	}
+
+	Tile& tile = map.GetLayers()[1].GetTiles()[tile_id];
+
+	return tile;
+}
+int Pathfinder::getTileIdAtPosition(sf::Vector2f& pos, Map& map)
+{
 	int tile_col = pos.x / map.GetTileSize();
 	int tile_row = pos.y / map.GetTileSize();
 
 	int tile_id = tile_col + (tile_row * map.GetWidth());
 
-	Tile& tile = map.GetLayers()[0].GetTiles()[tile_id];
-
-	return tile;
+	return tile_id;
 }
 void Pathfinder::reset(Map& map)
 {

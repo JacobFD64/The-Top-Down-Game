@@ -16,6 +16,7 @@ public:
 	~Pathfinder();
 	std::vector<Tile*> findPath(sf::Vector2f& start_pos, sf::Vector2f& target_pos, Map& map);
 	Tile& getTileAtPosition(sf::Vector2f& pos, Map& map);
+	int getTileIdAtPosition(sf::Vector2f& pos, Map& map);
 
 	bool isTileValid(int tile_id, Map& map);
 	void addTileToQueue(int tile_id, std::queue<Tile*>& tile_queue, Map& map, Tile& parent_tile);

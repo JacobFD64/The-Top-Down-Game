@@ -81,6 +81,108 @@ bool GameObject::collisionCheck(sf::Sprite& sprite1, sf::Sprite& sprite2)
         return false;
     }
 }
+bool GameObject::collisionCheckTiles(sf::Sprite& sprite,Map& map,Pathfinder& pathfinder)
+{
+    sf::FloatRect player_bounds = sprite.getGlobalBounds();
+
+    int leftTile = player_bounds.left / map.GetTileSize();
+    int rightTile = (player_bounds.left + player_bounds.width) / map.GetTileSize();
+    int topTile = player_bounds.top / map.GetTileSize();
+    int bottomTile = (player_bounds.top + player_bounds.height) / map.GetTileSize();
+
+    for (int y = topTile; y <= bottomTile; y++) 
+    {
+        for (int x = leftTile; x <= rightTile; x++) 
+        {
+            sf::Vector2f pos(x * map.GetTileSize(), y * map.GetTileSize());
+            Tile& tile = pathfinder.getTileAtPosition(pos, map);
+            sf::FloatRect tile_bounds = tile.GetSprite().getGlobalBounds();
+            if (tile.getIsCollidable())
+            {
+                if (collisionCheck(sprite, tile.GetSprite()))
+                {
+                    float overlapX = std::min(
+                        player_bounds.left + player_bounds.width - tile_bounds.left,
+                        tile_bounds.left + tile_bounds.width - player_bounds.left
+                    );
+
+                    float overlapY = std::min(
+                        player_bounds.top + player_bounds.height - tile_bounds.top,
+                        tile_bounds.top + tile_bounds.height - player_bounds.top
+                    );
+                    if (overlapX > overlapY)
+                    {
+                        if (velocity.y > 0) // moving down
+                        {
+                            sprite.setPosition(
+                                sprite.getPosition().x,
+                                tile_bounds.top - player_bounds.height - 10
+                            );
+                        }
+                        else if (velocity.y < 0) // moving up
+                        {
+                            sprite.setPosition(
+                                sprite.getPosition().x,
+                                tile_bounds.top + tile_bounds.height + 10
+                            );
+                        }
+                        else if (velocity.x > 0) // moving right
+                        {
+                            sprite.setPosition(
+                                tile_bounds.left - player_bounds.width - 10,
+                                sprite.getPosition().y
+                            );
+                            player_bounds = sprite.getGlobalBounds();
+                        }
+                        else if (velocity.x < 0) // moving left
+                        {
+                            sprite.setPosition(
+                                tile_bounds.left + tile_bounds.width + 10,
+                                sprite.getPosition().y
+                            );
+                            player_bounds = sprite.getGlobalBounds();
+                        }
+                    }
+                    else
+                    {
+                        if (velocity.x > 0) // moving right
+                        {
+                            sprite.setPosition(
+                                tile_bounds.left - player_bounds.width - 10,
+                                sprite.getPosition().y
+                            );
+                            player_bounds = sprite.getGlobalBounds();
+                        }
+                        else if (velocity.x < 0) // moving left
+                        {
+                            sprite.setPosition(
+                                tile_bounds.left + tile_bounds.width + 10,
+                                sprite.getPosition().y
+                            );
+                            player_bounds = sprite.getGlobalBounds();
+                        }
+                        else if (velocity.y > 0) // moving down
+                        {
+                            sprite.setPosition(
+                                sprite.getPosition().x,
+                                tile_bounds.top - player_bounds.height - 10
+                            );
+                        }
+                        else if (velocity.y < 0) // moving up
+                        {
+                            sprite.setPosition(
+                                sprite.getPosition().x,
+                                tile_bounds.top + tile_bounds.height + 10
+                            );
+                        }
+                    }
+                    return true;
+				}
+            }
+        }
+    }
+    return false;
+}
 void GameObject::moveTowards(sf::Vector2f& target)
 {
     direction.x = target.x - (getSprite().getPosition().x + getSprite().getGlobalBounds().width / 2);

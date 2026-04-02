@@ -42,9 +42,11 @@ Map JsonLoader::LoadMapFromJson(std::string path)
 				int x = i % map.GetWidth();
 				int y = i / map.GetHeight();
 
+				bool iscollidable = collider;
 
 
-				layer.AddTile(Tile(pos_id,tile_id, x, y, map.GetSpriteSheet()));
+
+				layer.AddTile(Tile(pos_id,tile_id, x, y,iscollidable, map.GetSpriteSheet()));
 			}
 
 			map.AddLayer(std::move(layer));

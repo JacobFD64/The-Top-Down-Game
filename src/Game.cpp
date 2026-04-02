@@ -41,7 +41,7 @@ void Game::message(Text& text)
 }
 bool Game::init()
 {
-	menu_text.init(200, 0, "Welcome to the Top Down Game.\nCollect all coins in 2 minutes!\nClick to move.\nPlease select an option:", sf::Color::White);
+	menu_text.init(200, 0, "Welcome to the Top Down Game.\nCollect all coins in 2 minutes!\nClick to move normally and hold LControl to pathfind.\nPlease select an option:", sf::Color::White);
 	play_option.init(260, 200, "> Play <", sf::Color::White);
 	quit_option.init(720, 200, "Quit", sf::Color::White);
 	score_text.init(0, 0, "Score: " + std::to_string(score), sf::Color::Red);
@@ -53,7 +53,7 @@ bool Game::init()
 
 	player = std::make_unique<GameObject>();
 
-	player->getSprite().setScale(0.2, 0.2);
+	player->getSprite().setScale(0.16, 0.16);
 	player->getSprite().setPosition(600, 360);
 
 	
@@ -64,7 +64,6 @@ bool Game::init()
 	std::vector<int> coin_ids = JsonLoader::LoadCoinPositionsFromJson("C:/Users/JacobFD64/Source/Repos/The-Top-Down-Game/Data/Coin_positions.json");
 	for (int i = 0; i < coin_ids.size(); i++)
 	{
-		std::cout << coin_ids[i] << std::endl;
 		Collectible coin;
 		coins.push_back(coin);
 		coins[i].initialiseSprite(coin_texture, "C:/Users/JacobFD64/Source/Repos/The-Top-Down-Game/Data/Images/kenney_physicspack/PNG/Other/coinGold.png");
@@ -88,10 +87,14 @@ void Game::update(float dt)
 {
 	if (in_menu == false)
 	{
+		sf::Vector2f player_pos = player->getSprite().getPosition();
+		int current_tile_id = pathfinder->getTileIdAtPosition(player_pos, *map);
 		if (pathfinder->current_node < pathfinder->path.size())
 		{
+			pathing = true;
 			sf::Vector2f target = pathfinder->path[pathfinder->current_node]->GetSprite().getPosition() + sf::Vector2f(map->GetTileSize() / 2, map->GetTileSize() / 2);
-			sf::Vector2f direction = target - player->getSprite().getPosition() + sf::Vector2f(player->getSprite().getGlobalBounds().width / 2, player->getSprite().getGlobalBounds().height / 2);
+			player->target_position = target;
+			sf::Vector2f direction = target - player->getSprite().getPosition();
 			float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
 			if (player->hasReachedTarget())
@@ -104,11 +107,15 @@ void Game::update(float dt)
 				player->moveTowards(target);
 			}
 		}
-		else
+		else if (pathing == true)
 		{
 			player->velocity = (0, 0);
-			pathfinder->current_node = 0;
-			pathfinder->path.clear();
+			pathfinder->reset(*map);
+			pathing = false;
+		}
+		else if (player->hasReachedTarget() || player->collisionCheckTiles(player->getSprite(), *map, *pathfinder) && player->velocity.x != 0 && pathing == false)
+		{
+			player->velocity = (0, 0);
 		}
 		player->update();
 		main_view.setCenter(player->getCentre());
@@ -201,10 +208,18 @@ void Game::mouseClicked(sf::Event event)
   sf::Vector2f world_pos = window.mapPixelToCoords(click);
 
   sf::Vector2f player_pos = player->getSprite().getPosition() + sf::Vector2f(player->getSprite().getGlobalBounds().width / 2, player->getSprite().getGlobalBounds().height / 2);
-  if (pathfinder->isTileValid(pathfinder->getTileAtPosition(world_pos, *map).getPosID(), *map))
+  if (pathfinder->isTileValid(pathfinder->getTileIdAtPosition(world_pos, *map), *map))
   {
-	  pathfinder->path = pathfinder->findPath(player_pos, world_pos, *map);
-	  std::reverse(pathfinder->path.begin(), pathfinder->path.end());
+	  if (is_pathfinding == true)
+	  {
+		  pathfinder->path = pathfinder->findPath(player_pos, world_pos, *map);
+		  std::reverse(pathfinder->path.begin(), pathfinder->path.end());
+	  }
+	  else
+	  {
+		  pathfinder->reset(*map);
+		  player->moveTowards(world_pos);
+	  }
   }
 }
 
@@ -245,6 +260,18 @@ void Game::keyPressed(sf::Event event)
 		{
 			reset();
 		}
+		if (event.key.code == sf::Keyboard::LControl)
+		{
+			is_pathfinding = true;
+		}
+
+	}
+}
+void Game::keyReleased(sf::Event event)
+{
+	if (event.key.code == sf::Keyboard::LControl)
+	{
+		is_pathfinding = false;
 	}
 }
 

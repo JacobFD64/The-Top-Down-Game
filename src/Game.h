@@ -25,6 +25,7 @@ class Game
   void render();
   void mouseClicked(sf::Event event);
   void keyPressed(sf::Event event);
+  void keyReleased(sf::Event event);
 
   sf::IntRect GetRectForTileId(int id);
 
@@ -42,6 +43,8 @@ class Game
 
   bool play_selected;
   bool in_menu = true;
+  bool is_pathfinding = false;
+  bool pathing = false;
 
   int score = 0;
 
