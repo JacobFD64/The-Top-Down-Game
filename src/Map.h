@@ -14,6 +14,8 @@ public:
 	int GetWidth() { return mapWidth; };
 	int GetHeight() { return mapHeight; };
 	std::shared_ptr<sf::Texture>& GetSpriteSheet() { return spritesheet; };
+	Tile& getTileAtPosition(sf::Vector2f& pos);
+	sf::Vector2f getTilePosition(int id);
 
 	void SetSpriteSheet(std::string path) { spritesheet->loadFromFile(path); };
 

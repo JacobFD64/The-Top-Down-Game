@@ -58,3 +58,16 @@ Map JsonLoader::LoadMapFromJson(std::string path)
 
 
 }
+std::vector<int> JsonLoader::LoadCoinPositionsFromJson(std::string path)
+{
+	nlohmann::json j = loadJson(path);
+
+	std::vector<int> coin_positions;
+
+	for (auto& coin : j.at("Coins"))
+	{
+		coin_positions.push_back(coin.get<int>());
+	}
+
+	return coin_positions;
+}

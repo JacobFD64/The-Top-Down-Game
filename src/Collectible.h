@@ -10,7 +10,7 @@
 class Collectible : public GameObject
 {
 public:
-	void checkPlayerCollision(GameObject player);
+	void checkPlayerCollision(GameObject player, int& score);
 
 
 private:

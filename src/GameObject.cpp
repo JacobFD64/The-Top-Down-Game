@@ -44,6 +44,13 @@ bool GameObject::getIsVisible()
 {
     return is_visible;
 }
+sf::Vector2f GameObject::getCentre()
+{
+    sf::Vector2f position = sprite.getPosition();
+    float half_width = sprite.getGlobalBounds().width / 2;
+	float half_height = sprite.getGlobalBounds().height / 2;
+	return sf::Vector2f(position + sf::Vector2f(half_width, half_height));
+}
 bool GameObject::collisionCheck(sf::Sprite& sprite1, sf::Sprite& sprite2)
 {
     // Get the position and size of the sprites' bounding boxes

@@ -29,7 +29,6 @@ std::vector<Tile*> Pathfinder::findPath(sf::Vector2f& start_pos, sf::Vector2f& t
 		tiles_to_search.pop();
 		// add the id to the searched list
 		current->setSearched(true);
-		current->GetSprite().setColor(sf::Color::Red);
 
 		 //Check if the id is the target tile
 		if (current->getPosID() == target_tile.getPosID())
@@ -40,11 +39,6 @@ std::vector<Tile*> Pathfinder::findPath(sf::Vector2f& start_pos, sf::Vector2f& t
 			{
 				path.push_back(current);
 				current = &map.GetLayers()[0].GetTiles()[current->getParentTileID()];
-			}
-
-			for (Tile* tile : path)
-			{
-				tile->GetSprite().setColor(sf::Color::Green);
 			}
 			return path;
 		}
@@ -105,4 +99,6 @@ void Pathfinder::reset(Map& map)
 		tile.setSearched(false);
 		tile.GetSprite().setColor(sf::Color::White);
 	}
+	current_node = 0;
+	path.clear();
 }

@@ -11,6 +11,7 @@
 #include "Vector.h"
 #include "Collectible.h"
 #include "Pathfinder.h"
+#include "Text.h"
 
 class Game
 {
@@ -18,6 +19,8 @@ class Game
   Game(sf::RenderWindow& window);
   ~Game();
   bool init();
+  void reset();
+  void message(Text& text);
   void update(float dt);
   void render();
   void mouseClicked(sf::Event event);
@@ -25,9 +28,22 @@ class Game
 
   sf::IntRect GetRectForTileId(int id);
 
-  Collectible coin;
+  std::vector<Collectible>  coins;
 
   sf::Texture coin_texture;
+
+  Text menu_text;
+  Text play_option;
+  Text quit_option;
+  Text score_text;
+  Text timer_text;
+  Text win_text;
+  Text lose_text;
+
+  bool play_selected;
+  bool in_menu = true;
+
+  int score = 0;
 
  private:
   sf::RenderWindow& window;
@@ -39,6 +55,14 @@ class Game
   std::unique_ptr <Pathfinder> pathfinder;
 
   sf::Texture player_texture;
+
+  sf::View main_view;
+
+  sf::View ui_view;
+  
+  sf::Clock gameClock;
+  
+  float main_view_scale_factor = 1.4;
 
 };
 

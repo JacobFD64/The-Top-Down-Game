@@ -17,6 +17,7 @@ public:
 	void setIsVisible(bool visibility);
 	bool getIsVisible();
 	int getSpeed() { return speed; };
+	sf::Vector2f getCentre();
 	bool collisionCheck(sf::Sprite& sprite1, sf::Sprite& sprite2);
 	void moveTowards(sf::Vector2f& target);
     bool hasReachedTarget();

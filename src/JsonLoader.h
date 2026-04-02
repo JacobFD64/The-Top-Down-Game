@@ -12,6 +12,7 @@ class JsonLoader
 public:
 	static nlohmann::json loadJson (const std::string& path);
 	static Map LoadMapFromJson(std::string path);
+	static std::vector<int> LoadCoinPositionsFromJson(std::string path);
 
 private:
 
